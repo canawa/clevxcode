@@ -48,6 +48,15 @@ struct MacRootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: state.hasSubscription)
+        .overlay(alignment: .top) {
+            if let toast = state.toast {
+                ToastView(toast: toast)
+                    .padding(.top, 10)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(10)
+            }
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: state.toast)
     }
 }
 
@@ -119,6 +128,15 @@ struct MenuBarPanel: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+
+                if let notice = state.statusNoticeText {
+                    Text(notice)
+                        .font(.caption2)
+                        .foregroundColor(Theme.red)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
 
                 Divider()
 

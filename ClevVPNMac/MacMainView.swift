@@ -218,15 +218,6 @@ struct MacHomeView: View {
     var body: some View {
         mainStack
             .background(StatusGlow(status: glowStatus).ignoresSafeArea())
-            .overlay(alignment: .top) {
-                if let toast = state.toast {
-                    ToastView(toast: toast)
-                        .padding(.top, 8)
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                        .zIndex(1)
-                }
-            }
-            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: state.toast)
     }
 
     private var glowStatus: StatusGlow.Status {
@@ -251,10 +242,8 @@ struct MacHomeView: View {
             }
             .padding(.top, 2)
 
-            // Уведомления / ошибки — под кнопкой Start (не внизу настроек).
+            // Уведомления / ошибки — под кнопкой Start (единый стиль).
             statusNotice
-
-            setupBanner
 
             // Announce + трафик/дата — одна карточка, разделённые линией
             VStack(spacing: 0) {
@@ -421,63 +410,32 @@ struct MacHomeView: View {
         .padding(.top, 12)
     }
 
-    /// Красный текст под Start: ошибка туннеля, подписки или конфликт VPN.
+    /// Красный текст под Start + кнопка Allow, если нужна авторизация.
     @ViewBuilder
     private var statusNotice: some View {
-        if let error = state.tunnel.lastError ?? state.errorMessage {
-            Text(error)
+        if let text = state.statusNoticeText {
+            Text(text)
                 .font(.caption2)
                 .foregroundColor(Theme.red)
-                .lineLimit(3)
+                .lineLimit(4)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 24)
                 .textSelection(.enabled)
-        } else if let conflict = state.conflict {
-            Text("You already have another VPN turned on. Turn it off and try again.")
-                .font(.caption2)
-                .foregroundColor(Theme.red)
-                .lineLimit(3)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
-                .onTapGesture { state.recheckConflict() }
-                .help(Text(verbatim: conflict.name))
-        }
-    }
-
-    /// Баннер первичной настройки: нет ядра или нет прав.
-    @ViewBuilder
-    private var setupBanner: some View {
-        if state.tunnel.corePath == nil {
+                .onTapGesture {
+                    if state.conflict != nil { state.recheckConflict() }
+                }
+        } else if state.needsTunnelAuthorization {
             HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(Theme.orange)
-                Text("Install the core: brew install sing-box")
-                    .font(.caption)
-                    .foregroundColor(Theme.textPrimary)
-                    .textSelection(.enabled)
-                Spacer()
-                Button("Re-check") { state.tunnel.refreshEnvironment() }
-                    .font(.caption)
-            }
-            .padding(10)
-            .card()
-            .padding(.horizontal, 20)
-        } else if !state.tunnel.isAuthorized {
-            HStack(spacing: 8) {
-                Image(systemName: "lock.shield")
-                    .foregroundColor(Theme.yellow)
                 Text("Allow ClevVPN to manage the tunnel (admin password, one time)")
-                    .font(.caption)
-                    .foregroundColor(Theme.textPrimary)
-                Spacer()
+                    .font(.caption2)
+                    .foregroundColor(Theme.red)
+                    .multilineTextAlignment(.leading)
                 Button("Allow") {
                     Task { await state.tunnel.authorize() }
                 }
                 .font(.caption.weight(.semibold))
             }
-            .padding(10)
-            .card()
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 24)
         }
     }
 

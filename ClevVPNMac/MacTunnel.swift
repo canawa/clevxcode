@@ -115,6 +115,8 @@ final class MacTunnel: ObservableObject {
                 if !message.contains("-128") { // -128 = пользователь нажал «Отмена»
                     lastError = message.trimmingCharacters(in: .whitespacesAndNewlines)
                 }
+            } else {
+                lastError = nil
             }
         } catch {
             lastError = error.localizedDescription
@@ -210,10 +212,8 @@ final class MacTunnel: ObservableObject {
         process = nil
         state = .disconnected
         connectedAt = nil
-        // Ядро упало само — показываем хвост лога
-        if let log = try? String(contentsOf: logURL, encoding: .utf8) {
-            let tail = log.split(separator: "\n").suffix(3).joined(separator: "\n")
-            if !tail.isEmpty { lastError = tail }
+            // Ядро упало само — короткое понятное сообщение, не сырой хвост лога
+            lastError = String(localized: "Tunnel stopped unexpectedly")
         }
     }
 

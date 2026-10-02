@@ -125,6 +125,25 @@ final class MacState: ObservableObject {
         return servers.first { $0.id == id } ?? servers.first
     }
 
+    /// Текст красного уведомления под Start (единая точка для всех ошибок).
+    var statusNoticeText: String? {
+        if let error = tunnel.lastError, !error.isEmpty { return error }
+        // Конфликт VPN важнее старой ошибки обновления подписки.
+        if conflict != nil {
+            return String(localized: "You already have another VPN turned on. Turn it off and try again.")
+        }
+        if let error = errorMessage, !error.isEmpty { return error }
+        if tunnel.corePath == nil {
+            return String(localized: "Install the core: brew install sing-box")
+        }
+        return nil
+    }
+
+    /// Нужна разовая авторизация sudo — кнопка Allow рядом с уведомлением.
+    var needsTunnelAuthorization: Bool {
+        tunnel.corePath != nil && !tunnel.isAuthorized
+    }
+
     // MARK: - Подписка
 
     func activate(urlString: String) async -> Bool {
@@ -141,7 +160,7 @@ final class MacState: ObservableObject {
             }
             return true
         } catch {
-            errorMessage = error.localizedDescription
+            presentError(error.localizedDescription)
             return false
         }
     }
@@ -156,10 +175,7 @@ final class MacState: ObservableObject {
             SharedStore.cachedSubscription = sub
             errorMessage = nil
         } catch {
-            let text = error.localizedDescription
-            errorMessage = text
-            // Показываем как на главном (под Connect) + toast поверх настроек.
-            showToast(.error, text: text)
+            presentError(error.localizedDescription)
         }
     }
 
@@ -224,7 +240,21 @@ final class MacState: ObservableObject {
     }
 
     func startTunnel() async {
-        guard let server = selectedServer else { return }
+        guard let server = selectedServer else {
+            presentError(String(localized: "Pick a server first"))
+            return
+        }
+        // Конфликт с другим VPN — не поднимаем туннель, текст уже под Start.
+        if conflict != nil {
+            presentError(String(localized: "You already have another VPN turned on. Turn it off and try again."))
+            return
+        }
+        if tunnel.corePath == nil {
+            presentError(String(localized: "Install the core: brew install sing-box"))
+            return
+        }
+
+        errorMessage = nil
         let tunnelServers = [server]
         // Kill Switch требует прав pfctl — спрашиваем их до подъёма туннеля,
         // чтобы разовый запрос пароля не выскочил уже после подключения.
@@ -237,6 +267,11 @@ final class MacState: ObservableObject {
         if killSwitchEnabled, tunnel.state == .connected {
             let hosts = tunnelServers.map(\.host)
             Task.detached { KillSwitch.enable(serverHosts: hosts) }
+        }
+        // Упавший старт уже положил текст в tunnel.lastError — продублируем toast,
+        // если открыты настройки / меню (главный экран и так покажет под Start).
+        if tunnel.state != .connected, let err = tunnel.lastError, !err.isEmpty {
+            showToast(.error, text: err)
         }
     }
 
@@ -309,12 +344,21 @@ final class MacState: ObservableObject {
 
     private func showConflictToast() {
         if let conflict {
-            showToast(.error, text: String(
+            presentError(String(
                 format: String(localized: "Another VPN is still on: %@", bundle: .main),
                 conflict.name))
         } else {
+            errorMessage = nil
             showToast(.success, text: String(localized: "No other VPN — all clear", bundle: .main))
         }
+    }
+
+    /// Ошибка для пользователя: под Start + toast (видно и поверх настроек).
+    func presentError(_ text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        errorMessage = trimmed
+        showToast(.error, text: trimmed)
     }
 
     func showToast(_ kind: ToastMessage.Kind, text: String) {

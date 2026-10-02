@@ -219,6 +219,7 @@ final class AppState: ObservableObject {
 
     /// Запуск/перезапуск туннеля с текущим выбором (сервер или «Авто») и правилами.
     func startTunnel(reconnect: Bool) async {
+        errorMessage = nil
         let auto = isAutoSelected
         let tunnelServers: [Server]
         if auto {
@@ -226,6 +227,7 @@ final class AppState: ObservableObject {
         } else if let server = selectedServer {
             tunnelServers = [server]
         } else {
+            errorMessage = String(localized: "Pick a server first")
             return
         }
         if reconnect {

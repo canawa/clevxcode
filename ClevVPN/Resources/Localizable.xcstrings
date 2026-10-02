@@ -1099,6 +1099,26 @@
         }
       }
     },
+    "Pick a server first" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сначала выберите сервер"
+          }
+        }
+      }
+    },
+    "Tunnel stopped unexpectedly" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Туннель неожиданно остановился"
+          }
+        }
+      }
+    },
     "Type" : {
       "localizations" : {
         "ru" : {
