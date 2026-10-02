@@ -9,8 +9,9 @@ Trojan, Hysteria2, Shadowsocks, TUN, маршрутизация, пинг.
 ```bash
 git clone https://github.com/canawa/clevxcode.git
 cd clevxcode
-brew install xcodegen
-xcodegen generate
+brew install xcodegen sing-box
+chmod +x scripts/*.sh
+./scripts/generate-xcodeproj.sh
 open ClevVPN.xcodeproj
 ```
 
@@ -18,22 +19,19 @@ open ClevVPN.xcodeproj
 
 | Схема | Что это |
 |---|---|
-| **ClevVPN** | iOS (нужен платный Apple Developer для реального VPN-туннеля) |
-| **ClevVPNPreview** | iOS UI без Network Extension (можно на бесплатном Apple ID) |
-| **ClevVPNMac** | macOS-клиент (`brew install sing-box`, при первом коннекте — пароль админа) |
+| **ClevVPN** | iOS VPN (платный Apple Developer + Libbox) |
+| **ClevVPNPreview** | iOS UI без VPN (можно бесплатный Apple ID) |
+| **ClevVPNMac** | macOS (`brew install sing-box`) |
 
-Без сборки Libbox iOS-сборка всё равно открывается (UI, парсинг, TCP-пинг), но туннель
-не стартует — код ядра под `#if canImport(Libbox)`.
-
-### iOS: ядро Libbox (один раз, ~15 мин)
+### iOS: реальный VPN (один раз, ~15 мин)
 
 ```bash
-brew install go
-./scripts/build-libbox.sh
-# Раскомментировать блоки Libbox в project.yml (два места), затем:
-xcodegen generate
+./scripts/setup-ios.sh
+open ClevVPN.xcodeproj
+# схема ClevVPN → iPhone → Team → Run → ключ Remnawave → Connect
 ```
 
+Без `setup-ios.sh` туннель на iOS не поднимется (нет Libbox). Mac и Preview работают и так.
 ## Возможности
 
 - **Активация по ключу** — ссылка подписки Remnawave

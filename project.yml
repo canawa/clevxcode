@@ -41,10 +41,9 @@ targets:
         embed: true
       - target: PacketTunnel
         embed: true
-      # После сборки ядра (scripts/build-libbox.sh) раскомментировать
-      # и выполнить: xcodegen generate
-      # - framework: Frameworks/Libbox.xcframework
-      #   embed: true
+      # Ядро sing-box: сначала ./scripts/setup-ios.sh (или build-libbox.sh)
+      - framework: Frameworks/Libbox.xcframework
+        embed: true
     info:
       path: ClevVPN/Info.plist
       properties:
@@ -74,9 +73,8 @@ targets:
       - target: ClevVPNKit
         embed: false
         link: true
-      # После сборки ядра раскомментировать (embed делает основной таргет)
-      # - framework: Frameworks/Libbox.xcframework
-      #   embed: false
+      - framework: Frameworks/Libbox.xcframework
+        embed: false
     info:
       path: PacketTunnel/Info.plist
       properties:
@@ -123,11 +121,9 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         INFOPLIST_KEY_UIUserInterfaceStyle: Dark
-        # Personal Team (бесплатный Apple ID) — для установки на устройство
-        DEVELOPMENT_TEAM: BZYP3V6365
+        # Team выбрать в Xcode (Signing & Capabilities)
 
-  # macOS-версия: ядро sing-box запускается обычным root-процессом,
-  # поэтому TUN работает без платного аккаунта Apple.
+  # macOS: ядро sing-box — root-процесс, без платного аккаунта Apple.
   ClevVPNKitMac:
     type: framework
     platform: macOS

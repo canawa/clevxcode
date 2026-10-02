@@ -44,14 +44,10 @@ final class AppState: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     #if DEBUG
-    /// Demo-режим: реальный туннель недоступен (ядро не собрано) — показываем UI
-    /// с подгруженной подпиской и «понарошку» подключаемся. Либо форс по CLEV_DEMO=1.
+    /// Явный demo: только CLEV_DEMO=1. Без Libbox реальный Connect покажет ошибку
+    /// ядра — не подменяем «понарошку», чтобы с настоящей подпиской шёл реальный VPN.
     static let demoMode: Bool = {
-        #if canImport(Libbox)
-        return ProcessInfo.processInfo.environment["CLEV_DEMO"] == "1"
-        #else
-        return true
-        #endif
+        ProcessInfo.processInfo.environment["CLEV_DEMO"] == "1"
     }()
     #else
     static let demoMode = false
@@ -69,9 +65,6 @@ final class AppState: ObservableObject {
         pings = SharedStore.pingResults
 
         #if DEBUG
-        // Demo-режим: без собранного ядра (или по CLEV_DEMO=1) всегда подставляем
-        // preview-подписку из бандла (announce + все серверы) и «подключаемся»
-        // понарошку — чтобы отсмотреть весь UI. Старый кэш не мешает.
         if Self.demoMode {
             let sub = Self.demoSubscription()
             KeychainStore.subscriptionURL = "demo"
@@ -208,6 +201,11 @@ final class AppState: ObservableObject {
             }
             return
         }
+        #endif
+        #if !canImport(Libbox)
+        // Ядро не слинковано — реальный туннель не поднимется.
+        vpn.setLastError(String(localized: "VPN core is missing. On Mac run: ./scripts/setup-ios.sh"))
+        return
         #endif
         switch vpn.state {
         case .connected, .connecting:

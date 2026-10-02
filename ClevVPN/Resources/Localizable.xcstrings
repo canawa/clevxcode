@@ -1139,6 +1139,16 @@
         }
       }
     },
+    "VPN core is missing. On Mac run: ./scripts/setup-ios.sh" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ядро VPN не собрано. На Mac выполните: ./scripts/setup-ios.sh"
+          }
+        }
+      }
+    },
     "Version" : {
       "localizations" : {
         "ru" : {

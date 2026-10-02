@@ -29,3 +29,9 @@ rm -rf "$ROOT/Frameworks/Libbox.xcframework"
 mkdir -p "$ROOT/Frameworks"
 cp -R Libbox.xcframework "$ROOT/Frameworks/"
 echo "==> Done: $ROOT/Frameworks/Libbox.xcframework"
+
+if command -v xcodegen >/dev/null 2>&1; then
+  echo "==> Regenerating Xcode project with Libbox"
+  "$ROOT/scripts/generate-xcodeproj.sh"
+fi
+echo "==> Next: open ClevVPN.xcodeproj → scheme ClevVPN → device + Team → Run"

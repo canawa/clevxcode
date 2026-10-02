@@ -16,6 +16,15 @@ public final class VPNManager: ObservableObject {
 
     @Published public private(set) var state: State = .disconnected
     @Published public private(set) var lastError: String?
+
+    /// Показать ошибку на UI (например, ядро не собрано).
+    public func setLastError(_ message: String?) {
+        lastError = message
+        if message != nil {
+            state = .disconnected
+            connectedAt = nil
+        }
+    }
     /// Момент подключения — для таймера сессии.
     @Published public private(set) var connectedAt: Date?
 
