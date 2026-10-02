@@ -806,7 +806,6 @@ struct SubscriptionSettingsCard: View {
     let title: String?
     let info: SubscriptionUserInfo?
     let isLoading: Bool
-    let errorMessage: String?
     let supportURL: String?
     let onRefresh: () -> Void
     let onDelete: () -> Void
@@ -870,13 +869,6 @@ struct SubscriptionSettingsCard: View {
                     .buttonStyle(.plain)
                 }
 
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.system(size: 12))
-                            .foregroundColor(Theme.red)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)

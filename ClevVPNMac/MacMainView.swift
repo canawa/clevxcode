@@ -50,6 +50,16 @@ struct MacSettingsSheet: View {
         }
         .frame(width: 460, height: 560)
         .background(Theme.background)
+        // Toast поверх листа настроек — иначе ошибка «терялась» внизу вкладки.
+        .overlay(alignment: .top) {
+            if let toast = state.toast {
+                ToastView(toast: toast)
+                    .padding(.top, 56)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(1)
+            }
+        }
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: state.toast)
     }
 }
 
@@ -241,18 +251,8 @@ struct MacHomeView: View {
             }
             .padding(.top, 2)
 
-            // Только ошибка (текст статуса убран — состояние видно по кнопке)
-            if let error = state.tunnel.lastError {
-                Text(error)
-                    .font(.caption2)
-                    .foregroundColor(Theme.red)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .textSelection(.enabled)
-            }
-
-            conflictBanner
+            // Уведомления / ошибки — под кнопкой Start (не внизу настроек).
+            statusNotice
 
             setupBanner
 
@@ -421,32 +421,26 @@ struct MacHomeView: View {
         .padding(.top, 12)
     }
 
-    /// Баннер конфликта: обнаружен другой активный VPN-клиент.
+    /// Красный текст под Start: ошибка туннеля, подписки или конфликт VPN.
     @ViewBuilder
-    private var conflictBanner: some View {
-        if let conflict = state.conflict {
-            HStack(spacing: 8) {
-                Image(systemName: "exclamationmark.octagon.fill")
-                    .foregroundColor(Theme.red)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Another VPN is running: \(conflict.name)")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(Theme.textPrimary)
-                    Text("Turn it off before connecting — two VPNs conflict over routing")
-                        .font(.caption2)
-                        .foregroundColor(Theme.textSecondary)
-                }
-                Spacer()
-                Button("Re-check") { state.recheckConflict() }
-                    .font(.caption)
-            }
-            .padding(10)
-            .background(Theme.red.opacity(0.12), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .strokeBorder(Theme.red.opacity(0.5), lineWidth: 1)
-            )
-            .padding(.horizontal, 20)
+    private var statusNotice: some View {
+        if let error = state.tunnel.lastError ?? state.errorMessage {
+            Text(error)
+                .font(.caption2)
+                .foregroundColor(Theme.red)
+                .lineLimit(3)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .textSelection(.enabled)
+        } else if let conflict = state.conflict {
+            Text("You already have another VPN turned on. Turn it off and try again.")
+                .font(.caption2)
+                .foregroundColor(Theme.red)
+                .lineLimit(3)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .onTapGesture { state.recheckConflict() }
+                .help(Text(verbatim: conflict.name))
         }
     }
 

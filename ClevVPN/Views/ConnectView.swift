@@ -40,14 +40,16 @@ struct ConnectView: View {
                     }
                     .padding(.top, 6)
 
-                    // Состояние видно по самой кнопке; показываем только ошибку
-                    // (в demo-режиме реального туннеля нет — ошибки скрываем).
-                    if let error = state.vpn.lastError, !AppState.demoMode {
-                        Text(error)
-                            .font(.caption2)
-                            .foregroundColor(Theme.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 24)
+                    // Состояние видно по самой кнопке; ошибки — под Start
+                    // (туннель + обновление подписки), как на Mac.
+                    if !AppState.demoMode {
+                        if let error = state.vpn.lastError ?? state.errorMessage {
+                            Text(error)
+                                .font(.caption2)
+                                .foregroundColor(Theme.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 24)
+                        }
                     }
 
                     // Announce + трафик/дата — одна карточка, разделённые линией (как на Mac)

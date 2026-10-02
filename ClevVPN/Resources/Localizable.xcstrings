@@ -1089,6 +1089,16 @@
         }
       }
     },
+    "You already have another VPN turned on. Turn it off and try again." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас уже включён другой VPN. Выключите его и попробуйте снова."
+          }
+        }
+      }
+    },
     "Type" : {
       "localizations" : {
         "ru" : {

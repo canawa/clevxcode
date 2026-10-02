@@ -156,7 +156,10 @@ final class MacState: ObservableObject {
             SharedStore.cachedSubscription = sub
             errorMessage = nil
         } catch {
-            errorMessage = error.localizedDescription
+            let text = error.localizedDescription
+            errorMessage = text
+            // Показываем как на главном (под Connect) + toast поверх настроек.
+            showToast(.error, text: text)
         }
     }
 

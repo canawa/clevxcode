@@ -153,7 +153,6 @@ struct MacSettingsView: View {
             title: state.subscription?.title,
             info: state.subscription?.userInfo,
             isLoading: state.isLoading,
-            errorMessage: state.errorMessage,
             supportURL: state.subscription?.supportURL,
             onRefresh: { Task { await state.refreshSubscription() } },
             onDelete: { showLogoutConfirm = true },
