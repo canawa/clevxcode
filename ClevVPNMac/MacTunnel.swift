@@ -212,9 +212,8 @@ final class MacTunnel: ObservableObject {
         process = nil
         state = .disconnected
         connectedAt = nil
-            // Ядро упало само — короткое понятное сообщение, не сырой хвост лога
-            lastError = String(localized: "Tunnel stopped unexpectedly")
-        }
+        // Ядро упало само — короткое понятное сообщение, не сырой хвост лога
+        lastError = String(localized: "Tunnel stopped unexpectedly")
     }
 
     private func waitForExit(_ process: Process) async {
