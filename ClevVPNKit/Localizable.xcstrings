@@ -1,0 +1,9 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "Invalid subscription link" : { "localizations" : { "ru" : { "stringUnit" : { "state" : "translated", "value" : "Неверная ссылка подписки" } } } },
+    "Server returned error %d" : { "localizations" : { "ru" : { "stringUnit" : { "state" : "translated", "value" : "Сервер вернул ошибку %d" } } } },
+    "No servers found in subscription" : { "localizations" : { "ru" : { "stringUnit" : { "state" : "translated", "value" : "В подписке не найдено серверов" } } } }
+  }
+}

@@ -1,0 +1,7 @@
+.DS_Store
+xcuserdata/
+*.xcodeproj
+build/
+DerivedData/
+Frameworks/Libbox.xcframework
+scripts/sing-box/
