@@ -82,12 +82,14 @@ final class MacState: ObservableObject {
         selectedServerID = SharedStore.selectedServerID
         favorites = SharedStore.favoriteServerIDs
         recentServerIDs = SharedStore.recentServerIDs
-        routingMode = SharedStore.routingMode
-        // На Mac в UI больше нет «умного» режима — сбрасываем в global.
-        if routingMode == .smart {
-            routingMode = .global
+        // Локальная переменная: нельзя читать self.routingMode, пока init не
+        // присвоил все stored properties (@Published).
+        var mode = SharedStore.routingMode
+        if mode == .smart {
+            mode = .global
             SharedStore.routingMode = .global
         }
+        routingMode = mode
         customRules = SharedStore.customRules
         appRules = SharedStore.appRules
         appRoutingMode = SharedStore.appRoutingMode
