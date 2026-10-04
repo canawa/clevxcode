@@ -166,7 +166,7 @@ public struct SingBoxConfigBuilder {
             ["protocol": "dns", "action": "hijack-dns"],
             ["ip_is_private": true, "outbound": "direct"]
         ]
-        var ruleSets: [[String: Any]] = []
+        let ruleSets: [[String: Any]] = []
 
         // Правила по приложениям (macOS) — приоритетнее всего остального
         if appRoutingMode != .off {

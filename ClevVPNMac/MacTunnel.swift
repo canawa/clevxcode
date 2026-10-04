@@ -25,12 +25,12 @@ final class MacTunnel: ObservableObject {
     /// Остановка инициирована пользователем — не показывать «ядро упало».
     private var isStopping = false
 
-    private static let brewCandidates = [
+    nonisolated private static let brewCandidates = [
         "/opt/homebrew/bin/sing-box",
         "/usr/local/bin/sing-box"
     ]
 
-    static let workDirectory: URL = {
+    nonisolated static let workDirectory: URL = {
         let url = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("ClevVPN", isDirectory: true)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
@@ -38,7 +38,7 @@ final class MacTunnel: ObservableObject {
     }()
 
     /// Стабильный путь установленного ядра (для sudoers и запуска).
-    static var installedCoreURL: URL {
+    nonisolated static var installedCoreURL: URL {
         workDirectory.appendingPathComponent("bin", isDirectory: true)
             .appendingPathComponent("sing-box")
     }
