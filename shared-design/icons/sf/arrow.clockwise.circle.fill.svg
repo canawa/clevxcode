@@ -1,6 +1,6 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <!-- macOS SF Symbol arrow.clockwise.circle.fill -->
-  <circle cx="12" cy="12" r="9.5" fill="#FFC400"/>
-  <path fill="none" stroke="#0B0B0D" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"
-        d="M15.9 9.15a3.85 3.85 0 1 0 .45 3.45M13.55 6.85h3.8v3.8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Extracted from CupertinoIcons.ttf U+F49C (uniF49C) — SF Symbol proxy -->
+  <g transform="translate(12,12) scale(0.04931507,-0.04931507) translate(-218.50000000,-192.00000000)">
+    <path fill="#FFC400" fill-rule="evenodd" d="M219 -27Q129 -27 64.5 38.0Q0 103 0 192Q0 282 64.0 346.5Q128 411 218 411Q307 411 372.0 346.5Q437 282 437 192Q437 103 372.5 38.0Q308 -27 219 -27ZM121 183Q121 142 149.5 113.5Q178 85 218.0 85.0Q258 85 286.5 113.5Q315 142 315 183Q315 197 300.0 197.0Q285 197 285 183Q285 155 265.5 135.0Q246 115 218.0 115.0Q190 115 170.5 134.5Q151 154 151 183Q151 211 170.5 230.0Q190 249 218 249H226L205 228Q201 224 201 218Q201 204 215 204Q220 204 224 208L267 250Q271 254 271.0 260.5Q271 267 267 271L225 313Q220 318 215 318Q201 318 201 304Q201 300 205 294L220 278Q219 278 217.0 278.5Q215 279 214 279Q177 279 149.0 250.5Q121 222 121 183Z"/>
+  </g>
 </svg>

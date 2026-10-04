@@ -35,9 +35,25 @@ Settings (gear sheet): Apps | Rules | Subscription | Language
 
 - `ConnectButton(size: 150)` — эталон desktop
 - States: off / busy / on
-- Icon: SF Symbol `power`
+- Icon: SF Symbol `power` (weight `.light`)
 - Press scale: 0.93
 - Android / Windows desktop: **150 dp/px**, не меньше
+
+### Plate ON gradient (`Components.swift` `plateRadial`) — копировать 1:1
+
+```
+RadialGradient(
+  colors: [logoYellow #FAC300, logoAmber #E39A00],
+  center: (0.5, 0.42),
+  startRadius: diameter * 0.05,
+  endRadius: diameter * 0.6
+)
+```
+
+- Top highlight: white @ 0.30 → clear (endPoint y=0.45)
+- Plate OFF: `#24242E` → `#0C0C11` (тот же center/radii)
+- Rim всегда `#30303A` → `#121217` (не желтеет)
+- WPF: `RadialGradientBrush` RadiusX/Y = **0.6**, GradientOrigin/Center = **0.5,0.42**
 
 ## Controls
 

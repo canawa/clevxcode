@@ -1,5 +1,6 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-  <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M13 2L6 13h5l-1 9 7-11h-5l1-9z" fill="currentColor" stroke="none"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Extracted from CupertinoIcons.ttf U+F598 (uniF598) — SF Symbol proxy -->
+  <g transform="translate(12,12) scale(0.04500991,-0.04500991) translate(-151.00000000,-191.61382114)">
+    <path fill="#FFC400" fill-rule="evenodd" d="M15 151Q0 151 0 165Q0 172 6 179L200 422Q211 436 223.5 429.5Q236 423 230 407L165 233H287Q302 233 302 219Q302 211 296 205L102 -39Q91 -53 79.0 -46.0Q67 -39 73 -23L136 151Z"/>
   </g>
 </svg>
