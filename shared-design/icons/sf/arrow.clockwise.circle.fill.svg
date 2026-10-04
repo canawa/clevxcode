@@ -1,0 +1,6 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- macOS SF Symbol arrow.clockwise.circle.fill -->
+  <circle cx="12" cy="12" r="9.5" fill="#FFC400"/>
+  <path fill="none" stroke="#0B0B0D" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"
+        d="M15.9 9.15a3.85 3.85 0 1 0 .45 3.45M13.55 6.85h3.8v3.8"/>
+</svg>

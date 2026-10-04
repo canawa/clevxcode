@@ -1,0 +1,218 @@
+name: ClevVPN
+options:
+  bundleIdPrefix: com.clevvpn
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: "NO"
+    # Симулятор: ad-hoc подпись без команды разработчика — Run работает сразу.
+    # Для устройства останется Automatic (выбрать Team в Signing & Capabilities).
+    "CODE_SIGN_STYLE[sdk=iphonesimulator*]": Manual
+    "CODE_SIGN_IDENTITY[sdk=iphonesimulator*]": "-"
+    "DEVELOPMENT_TEAM[sdk=iphonesimulator*]": ""
+    "PROVISIONING_PROFILE_SPECIFIER[sdk=iphonesimulator*]": ""
+
+targets:
+  ClevVPNKit:
+    type: framework
+    platform: iOS
+    sources: [ClevVPNKit]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.ios.kit
+        SKIP_INSTALL: "YES"
+        GENERATE_INFOPLIST_FILE: "YES"
+
+  ClevVPN:
+    type: application
+    platform: iOS
+    sources:
+      - ClevVPN
+    dependencies:
+      - target: ClevVPNKit
+        embed: true
+      - target: PacketTunnel
+        embed: true
+      # После сборки ядра (scripts/build-libbox.sh) раскомментировать
+      # и выполнить: xcodegen generate
+      # - framework: Frameworks/Libbox.xcframework
+      #   embed: true
+    info:
+      path: ClevVPN/Info.plist
+      properties:
+        CFBundleDisplayName: ClevVPN
+        CFBundleLocalizations: [en, ru]
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    entitlements:
+      path: ClevVPN/ClevVPN.entitlements
+      properties:
+        com.apple.developer.networking.networkextension: [packet-tunnel-provider]
+        com.apple.security.application-groups: [group.com.clevvpn.ios]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.ios
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+
+  PacketTunnel:
+    type: app-extension
+    platform: iOS
+    sources: [PacketTunnel]
+    dependencies:
+      - target: ClevVPNKit
+        embed: false
+        link: true
+      # После сборки ядра раскомментировать (embed делает основной таргет)
+      # - framework: Frameworks/Libbox.xcframework
+      #   embed: false
+    info:
+      path: PacketTunnel/Info.plist
+      properties:
+        CFBundleDisplayName: ClevVPN Tunnel
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+    entitlements:
+      path: PacketTunnel/PacketTunnel.entitlements
+      properties:
+        com.apple.developer.networking.networkextension: [packet-tunnel-provider]
+        com.apple.security.application-groups: [group.com.clevvpn.ios]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.ios.tunnel
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+
+  # Версия для установки на iPhone с БЕСПЛАТНЫМ Apple ID: без VPN-расширения
+  # и Network Extension entitlement (их Apple бесплатным аккаунтам не даёт).
+  # Интерфейс и серверы работают, туннель — нет.
+  ClevVPNPreview:
+    type: application
+    platform: iOS
+    sources:
+      - path: ClevVPN
+        excludes:
+          - Info.plist
+          - ClevVPN.entitlements
+    dependencies:
+      - target: ClevVPNKit
+        embed: true
+    info:
+      path: ClevVPNPreview/Info.plist
+      properties:
+        CFBundleDisplayName: ClevVPN Preview
+        CFBundleLocalizations: [en, ru]
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.ios.preview
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        # Personal Team (бесплатный Apple ID) — для установки на устройство
+        DEVELOPMENT_TEAM: BZYP3V6365
+
+  # macOS-версия: ядро sing-box запускается обычным root-процессом,
+  # поэтому TUN работает без платного аккаунта Apple.
+  ClevVPNKitMac:
+    type: framework
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources: [ClevVPNKit]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.mac.kit
+        PRODUCT_NAME: ClevVPNKit
+        SKIP_INSTALL: "YES"
+        GENERATE_INFOPLIST_FILE: "YES"
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+
+  ClevVPNMac:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: ClevVPNMac
+        excludes:
+          - Core/**
+      - ClevVPN/Theme
+      - ClevVPN/Resources
+      # Bundled sing-box (arm64 + amd64) — no Homebrew required
+      - path: ClevVPNMac/Core
+        type: folder
+        buildPhase: resources
+        excludes:
+          - README.md
+    dependencies:
+      - target: ClevVPNKitMac
+        embed: true
+    info:
+      path: ClevVPNMac/Info.plist
+      properties:
+        CFBundleDisplayName: ClevVPN
+        CFBundleLocalizations: [en, ru]
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: ClevVPN
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.clevvpn.mac
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIconMac
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: "NO"
+    postCompileScripts:
+      - name: chmod bundled sing-box
+        script: |
+          CORE_DIR="${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
+          for f in "$CORE_DIR"/sing-box-arm64 "$CORE_DIR"/sing-box-amd64 "$CORE_DIR"/sing-box; do
+            if [ -f "$f" ]; then chmod +x "$f"; fi
+          done
+        basedOnDependencyAnalysis: false
+
+  ClevVPNKitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [ClevVPNKitTests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+    dependencies:
+      - target: ClevVPNKit
+
+schemes:
+  ClevVPN:
+    build:
+      targets:
+        ClevVPN: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [ClevVPNKitTests]
+  ClevVPNPreview:
+    build:
+      targets:
+        ClevVPNPreview: all
+    run:
+      config: Debug
+  ClevVPNMac:
+    build:
+      targets:
+        ClevVPNMac: all
+    run:
+      config: Debug

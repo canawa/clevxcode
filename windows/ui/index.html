@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ClevVPN</title>
+<style>
+  :root{
+    --bg:#0B0B0D; --surface:#16161C; --surface2:#1E1E26; --stroke:rgba(255,255,255,.09);
+    --yellow:#FFC400; --amber:#E09E00; --green:#34D399; --red:#FF5C5C;
+    --text:#F5F5F7; --muted:#9A9AA2;
+    --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-user-select:none;user-select:none}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);height:100vh;overflow:hidden}
+  .screen{display:flex;flex-direction:column;height:100vh;padding:14px 16px 16px}
+  .hidden{display:none!important}
+
+  .top{display:flex;align-items:center;gap:8px;padding:6px 2px}
+  .mark{width:22px;height:22px;border-radius:6px;flex:none;
+    background:conic-gradient(from 210deg,var(--amber),var(--yellow),var(--amber));
+    -webkit-mask:radial-gradient(circle at 50% 118%,transparent 42%,#000 43%)}
+  .brand{font-size:18px;font-weight:600}.brand b{color:var(--yellow)}
+  .gear{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+
+  .announce{margin-top:6px;font-size:13px;line-height:1.5;color:var(--text);text-align:center;white-space:pre-line;
+    background:var(--surface);border:1px solid var(--stroke);border-radius:12px;padding:10px 12px}
+
+  .stage{display:flex;justify-content:center;padding:20px 0 8px}
+  .btn{position:relative;width:190px;height:190px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+  .btn:active{transform:scale(.95)}
+  .ring{position:absolute;inset:-12px;border-radius:50%;border:1.5px solid var(--stroke)}
+  .lit{position:absolute;inset:-12px;border-radius:50%;padding:2px;opacity:0;transition:.5s;
+    background:conic-gradient(from -90deg,var(--yellow),var(--amber),var(--yellow));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px))}
+  .on .lit{opacity:1}
+  .rim{position:absolute;inset:0;border-radius:50%;background:linear-gradient(#30303A,#121217);border:1px solid rgba(255,255,255,.06)}
+  .plate{position:absolute;inset:26px;border-radius:50%;border:1.5px solid rgba(0,0,0,.45);
+    background:radial-gradient(circle at 50% 42%,#24242E,#0C0C11);transition:.35s}
+  .on .plate{background:radial-gradient(circle at 50% 42%,var(--yellow),var(--amber));box-shadow:0 0 26px rgba(255,196,0,.45)}
+  .label{position:relative;z-index:2;text-align:center}
+  .ic{font-size:40px;line-height:1}.on .ic{color:rgba(0,0,0,.75)}
+  .ptxt{margin-top:5px;font-size:12px;letter-spacing:2px;color:var(--muted)}.on .ptxt{color:rgba(0,0,0,.5)}
+  .status{text-align:center;font-size:13px;color:var(--muted);min-height:18px}.on .status{color:var(--green)}
+
+  .chips{display:flex;gap:8px;margin-top:12px;overflow-x:auto}
+  .chip{flex:none;font-size:13px;font-weight:600;padding:6px 12px;border-radius:20px;background:var(--surface);border:1px solid var(--stroke);color:var(--muted);cursor:pointer}
+  .chip.sel{background:linear-gradient(var(--yellow),var(--amber));color:#000;border-color:transparent}
+
+  .list{margin-top:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1}
+  .row{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--stroke);cursor:pointer}
+  .row.sel{border-color:rgba(255,196,0,.6)}
+  .row .fl{font-size:20px}.row .nm{font-size:14px}.row .png{margin-left:auto;font-size:12px;color:var(--muted)}
+
+  input,select{width:100%;padding:11px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--stroke);color:var(--text);font-size:14px;font-family:var(--font)}
+  .cta{width:100%;padding:12px;border:none;border-radius:11px;background:linear-gradient(var(--yellow),var(--amber));color:#000;font-weight:600;font-size:15px;cursor:pointer;margin-top:12px}
+  .sec-title{font-size:15px;font-weight:600;margin:16px 0 8px}
+  .field{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .toggle-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:var(--surface);border:1px solid var(--stroke);margin-top:8px}
+  .back{background:none;border:none;color:var(--yellow);cursor:pointer;font-size:14px;padding:0}
+</style>
+</head>
+<body>
+
+<!-- Активация -->
+<div class="screen" id="activation">
+  <div class="top"><span class="mark"></span><span class="brand">Clev<b>VPN</b></span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px">
+    <div class="field">Вставьте ссылку-подписку (её выдаёт тот, кто дал вам приложение):</div>
+    <input id="subUrl" placeholder="https://sub.example.com/xxxxx" spellcheck="false" />
+    <button class="cta" id="activateBtn">Активировать</button>
+    <div class="status" id="actStatus"></div>
+  </div>
+</div>
+
+<!-- Главный -->
+<div class="screen hidden" id="main">
+  <div class="top"><span class="mark"></span><span class="brand">Clev<b>VPN</b></span>
+    <button class="gear" id="openSettings">⚙</button></div>
+  <div class="announce hidden" id="announce"></div>
+  <div class="stage">
+    <div class="btn" id="connectBtn">
+      <div class="ring"></div><div class="lit"></div><div class="rim"></div><div class="plate"></div>
+      <div class="label"><div class="ic">⏻</div><div class="ptxt" id="ptxt">Старт</div></div>
+    </div>
+  </div>
+  <div class="status" id="status">Нажмите, чтобы подключиться</div>
+  <div class="chips" id="chips"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<!-- Настройки / per-app -->
+<div class="screen hidden" id="settings">
+  <div class="top"><button class="back" id="closeSettings">‹ Назад</button>
+    <span class="brand" style="margin-left:8px">Настройки</span></div>
+  <div style="overflow-y:auto;flex:1">
+    <div class="sec-title">Приложения (per-app)</div>
+    <div class="field">Режим маршрутизации по приложениям:</div>
+    <select id="appMode">
+      <option value="off">Весь трафик через VPN</option>
+      <option value="bypass">Выбранные приложения — мимо VPN</option>
+      <option value="only">Только выбранные — через VPN</option>
+    </select>
+    <div class="field" style="margin-top:10px">Список приложений (имена .exe, по одному в строке):</div>
+    <textarea id="appList" rows="6" style="width:100%;padding:11px;border-radius:10px;background:var(--surface);border:1px solid var(--stroke);color:var(--text);font-family:var(--font);font-size:13px" placeholder="telegram.exe&#10;chrome.exe"></textarea>
+
+    <div class="sec-title">Безопасность</div>
+    <div class="toggle-row">
+      <div style="flex:1"><div style="font-weight:600">Kill Switch</div>
+        <div class="field" style="margin:2px 0 0">Блокирует интернет, если VPN отключится</div></div>
+      <input type="checkbox" id="killSwitch" style="width:auto" />
+    </div>
+
+    <div class="sec-title">Маршрутизация</div>
+    <div class="toggle-row">
+      <div style="flex:1"><div style="font-weight:600">Умный режим</div>
+        <div class="field" style="margin:2px 0 0">RU-сайты — напрямую</div></div>
+      <input type="checkbox" id="smart" style="width:auto" checked />
+    </div>
+  </div>
+</div>
+
+<script>
+const invoke = window.__TAURI__.invoke;
+let servers = [], selectedTag = null, connected = false, filter = "all";
+
+function q(id){return document.getElementById(id)}
+function show(id){["activation","main","settings"].forEach(s=>q(s).classList.toggle("hidden",s!==id))}
+
+function settings(){
+  return {
+    app_mode: q("appMode").value,
+    apps: q("appList").value.split("\n").map(s=>s.trim()).filter(Boolean),
+    smart: q("smart").checked,
+    kill_switch: q("killSwitch").checked,
+  };
+}
+
+async function refresh(){
+  const st = await invoke("get_status");
+  servers = st.servers || [];
+  if(st.announce){ q("announce").textContent = st.announce; q("announce").classList.remove("hidden"); }
+  connected = st.connected;
+  if(!servers.length){ show("activation"); return; }
+  if(!selectedTag && servers[0]) selectedTag = servers[0].tag;
+  renderChips(); renderList(); renderConn(); show("main");
+}
+
+function groups(){ return [...new Set(servers.map(s=>s.group).filter(Boolean))]; }
+function renderChips(){
+  const el=q("chips"); el.innerHTML="";
+  const add=(v,t)=>{const c=document.createElement("div");c.className="chip"+(filter===v?" sel":"");c.textContent=t;c.onclick=()=>{filter=v;renderChips();renderList()};el.appendChild(c)};
+  add("all","Все"); groups().forEach(g=>add("g:"+g,g));
+}
+function renderList(){
+  const el=q("list"); el.innerHTML="";
+  servers.filter(s=>filter==="all"||("g:"+s.group)===filter).forEach(s=>{
+    const r=document.createElement("div"); r.className="row"+(s.tag===selectedTag?" sel":"");
+    r.innerHTML=`<span class="fl">${s.flag||"🌐"}</span><span class="nm">${s.name}</span><span class="png" data-tag="${s.tag}">…</span>`;
+    r.onclick=()=>{selectedTag=s.tag;renderList()};
+    el.appendChild(r);
+  });
+}
+function renderConn(){
+  q("main").classList.toggle("on",connected);
+  q("ptxt").textContent = connected?"ПОДКЛЮЧЕНО":"Старт";
+  q("status").textContent = connected?"🔒 Защищено":"Нажмите, чтобы подключиться";
+}
+
+q("activateBtn").onclick=async()=>{
+  q("actStatus").textContent="Загрузка…";
+  try{ await invoke("activate",{url:q("subUrl").value.trim()}); await refresh(); }
+  catch(e){ q("actStatus").textContent="Ошибка: "+e; }
+};
+q("connectBtn").onclick=async()=>{
+  try{
+    if(connected){ await invoke("disconnect"); connected=false; }
+    else{ const s=settings(); await invoke("connect",{tag:selectedTag,...s}); connected=true; }
+    renderConn();
+  }catch(e){ q("status").textContent="Ошибка: "+e; }
+};
+q("openSettings").onclick=()=>show("settings");
+q("closeSettings").onclick=()=>show("main");
+
+// Пинг серверов: небольшими пачками, результат в ячейку [data-tag].
+async function pingAll(){
+  const batch = 12;
+  for(let i=0;i<servers.length;i+=batch){
+    await Promise.all(servers.slice(i,i+batch).map(async s=>{
+      if(!s.host) return;
+      const ms = await invoke("ping",{host:s.host,port:s.port}).catch(()=>null);
+      const cell = document.querySelector(`.png[data-tag="${s.tag}"]`);
+      if(cell) cell.textContent = ms==null ? "—" : ms+" ms";
+    }));
+  }
+}
+
+(async()=>{ await refresh(); if(servers.length) pingAll(); })();
+</script>
+</body>
+</html>

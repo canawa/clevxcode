@@ -1,0 +1,21 @@
+.DS_Store
+xcuserdata/
+*.xcodeproj
+build/
+DerivedData/
+.idea/
+.vscode/
+*.user
+*.zip
+cache.db
+Frameworks/Libbox.xcframework
+scripts/sing-box/
+# Local extract / merge scratch
+_extract_mac_ios/
+_extract_mac_source/
+_merge_diffs/
+merged/
+# Large binaries — regenerate via scripts/bundle-singbox-mac.sh|.ps1
+ClevVPNMac/Core/sing-box-arm64
+ClevVPNMac/Core/sing-box-amd64
+ClevVPNMac/Core/_tmp/
